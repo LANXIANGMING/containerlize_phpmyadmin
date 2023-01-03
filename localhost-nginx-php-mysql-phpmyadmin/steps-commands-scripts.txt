@@ -1,0 +1,123 @@
+#commands to install MySql
+$ sudo dnf install @mysql
+$ mysql --version
+$ sudo  systemctl start mysqld.service
+$ sudo systemctl status mysqld
+$ sudo systemctl enable mysqld
+$ sudo mysql_secure_installation
+$ sudo mysql -u root -p
+MySQL version: mysql  Ver 8.0.26 for Linux on x86_64
+MySQL account: root/password
+
+
+#create an admin to remotely access to mysql server
+CREATE USER 'bbi_admin'@'10.10.215.48' IDENTIFIED BY 'Admin@2022!!';
+GRANT ALL PRIVILEGES ON *.* TO 'bbi_admin'@'10.10.215.48' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+
+#Allow all remote connections
+GRANT ALL PRIVILEGES ON database_name.* TO 'bbi_admin'@'%';
+or
+GRANT ALL PRIVILEGES ON *.* TO 'bbi_admin'@'%';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
+
+#Allow connections from a range of IP address
+GRANT ALL PRIVILEGES ON database_name.* TO 'bbi_admin'@'10.10.215.*';
+GRANT ALL PRIVILEGES ON *.* TO 'bbi_admin'@'10.10.215.*';
+
+flush privileges;
+
+Standard DB user
+phpmyadmin/Std@2022~
+ns_admin/nsStd@2022~
+
+
+
+ 
+
+#commands to install php7
+$ sudo dnf -y install @php
+$ sudo dnf -y install php-zip php-json php-fpm
+
+$ sudo yum -y install php-mysqlnd
+$ sudo systemctl enable --now php-fpm
+
+#commands to install php8 via remi
+$ sudo dnf install https://rpms.remirepo.net/enterprise/remi-release-8.rpm
+$ sudo dnf install epel-release
+
+$ sudo dnf module list php
+$ sudo dnf module enable php:remi-8.2
+
+# change to install different PHP version
+$ sudo dnf module reset php
+$ sudo dnf module enable php:remi-8.2
+
+$ sudo dnf install php
+$ php -v
+$ php-fpm -i
+$ systemctl status php-fpm
+$ sudo systemctl restart php-fpm
+
+
+$ sudo systemctl stop php-fpm
+
+
+
+#commands to install phpMyAdmin
+$ wget https://files.phpmyadmin.net/phpMyAdmin/5.2.0/phpMyAdmin-5.2.0-all-languages.zip
+$ unzip phpMyAdmin-5.2.0-all-languages.zip
+
+$ sudo mv phpMyAdmin-5.2.0-all-languages /usr/share/phpMyAdmin
+$ sudo cp -pr /usr/share/phpMyAdmin/config.sample.inc.php /usr/share/phpMyAdmin/config.inc.php
+$ sudo nano /usr/share/phpMyAdmin/config.inc.php
+
+'blowfish_secret'= ['BBI'];
+BBI@2022 Nursing Stress Study~!
+
+$ mysql < /usr/share/phpMyAdmin/sql/create_tables.sql -u root -p
+
+$ sudo nano /etc/nginx/conf.d/phpMyAdmin.conf
+
+
+server {
+listen 80;
+   server_name 10.9.10.11;
+   root /usr/share/phpMyAdmin;
+
+   location / {
+      index index.php;
+   }
+
+## Images and static content is treated different
+   location ~*             ^.+.(jpg|jpeg|gif|css|png|js|ico|xml)$ {
+  access_log off;
+  expires 30d;
+   }
+
+   location ~ /\.ht {
+      deny all;
+   }
+
+   location ~ /(libraries|setup/frames|setup/libs) {
+      deny all;
+      return 404;
+   }
+
+   location ~ \.php$ {
+      include /etc/nginx/fastcgi_params;
+      fastcgi_pass 127.0.0.1:9000;
+      fastcgi_index index.php;
+      fastcgi_param SCRIPT_FILENAME /usr/share/phpMyAdmin$fastcgi_script_name;
+   }
+}
+
+
+
+#commands to install nginx
+$ sudo systemctl status nginx
+$ sudo yum install nginx
+$ nginx -V
+$ sudo systemctl enable nginx
+$ sudo systemctl restart nginx
